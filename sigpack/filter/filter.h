@@ -23,19 +23,19 @@ namespace sp
         // Ordinary FIR filter
         arma::uword M;           ///< Nr of filter taps
         arma::uword cur_p;       ///< Pointer to current sample in buffer
-        arma::Mat<T1> buf;       ///< Signal buffer
-        arma::Mat<T2> b;         ///< Filter coefficients
+        Eigen::MatrixXd<T1> buf;       ///< Signal buffer
+        Eigen::MatrixXd<T2> b;         ///< Filter coefficients
         // Adaptive LMS FIR filter
         double mu;               ///< Adaptive filter step size
         arma::uword L;           ///< Adaptive filter block length
         arma::uword blk_ctr;     ///< Adaptive filter block length counter
         T2 c;                    ///< Adaptive filter NLMS regulation const.
-        arma::Mat<T1> P;         ///< Adaptive filter Inverse corr matrix (estimated accuracy)
-        arma::Mat<T1> Q;         ///< Adaptive filter Process noise
-        arma::Mat<T1> R;         ///< Adaptive filter Measurement noise
-        arma::Mat<T1> K;         ///< Adaptive filter gain vector
+        Eigen::MatrixXd<T1> P;         ///< Adaptive filter Inverse corr matrix (estimated accuracy)
+        Eigen::MatrixXd<T1> Q;         ///< Adaptive filter Process noise
+        Eigen::MatrixXd<T1> R;         ///< Adaptive filter Measurement noise
+        Eigen::MatrixXd<T1> K;         ///< Adaptive filter gain vector
         double lmd;              ///< Adaptive filter RLS forgetting factor
-        arma::Mat<T1> X_tpz;     ///< Adaptive filter Toeplitz for Corr matrix calc.
+        Eigen::MatrixXd<T1> X_tpz;     ///< Adaptive filter Toeplitz for Corr matrix calc.
         arma::uword do_adapt;    ///< Adaptive filter enable flag
     public:
         ////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,7 +62,7 @@ namespace sp
         /// The internal state and pointers are cleared
         /// @param _b Filter coefficients \f$ [b_0 ..b_{M-1}]^T \f$
         ////////////////////////////////////////////////////////////////////////////////////////////
-        void set_coeffs(const arma::Mat<T2> &_b)
+        void set_coeffs(const Eigen::MatrixXd<T2> &_b)
         {
             M = _b.n_elem;
             buf.set_size(M,1);
@@ -76,9 +76,9 @@ namespace sp
         /// The internal state and pointers are cleared
         /// @param _b_col Filter coefficients \f$ [b_0 ..b_{M-1}]^T \f$
         ////////////////////////////////////////////////////////////////////////////////////////////
-        void set_coeffs(const arma::Col<T2> &_b_col)
+        void set_coeffs(const Eigen::VectorXd<T2> &_b_col)
         {
-          arma::Mat<T2> b_mat = arma::conv_to<arma::Mat<T2> >::from(_b_col);
+          Eigen::MatrixXd<T2> b_mat = arma::conv_to<Eigen::MatrixXd<T2> >::from(_b_col);
           set_coeffs(b_mat);
         }
 
@@ -86,16 +86,16 @@ namespace sp
         /// \brief Get coefficients from FIR filter.
         /// @return b Filter coefficients \f$ [b_0 ..b_{M-1}]^T \f$
         ////////////////////////////////////////////////////////////////////////////////////////////
-        arma::Col<T2> get_coeffs()
+	Eigen::VectorXd<T2> get_coeffs()
         {
-           return arma::conv_to<arma::Col<T2> >::from(b);
+           return arma::conv_to<Eigen::VectorXd<T2> >::from(b);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         /// \brief Updates coefficients in FIR filter without clearing the internal states.
         /// @param _b Filter coefficients \f$ [b_0 ..b_{M-1}] \f$
         ////////////////////////////////////////////////////////////////////////////////////////////
-        void update_coeffs(const arma::Mat<T2> &_b)
+        void update_coeffs(const Eigen::MatrixXd<T2> &_b)
         {
             b = _b;
         }
@@ -129,18 +129,18 @@ namespace sp
         /// @return Filtered output
         /// @param in Input vector
         ////////////////////////////////////////////////////////////////////////////////////////////
-        arma::Mat<T3> filter(const arma::Mat<T1> & in)
+        Eigen::MatrixXd<T3> filter(const Eigen::MatrixXd<T1> & in)
         {
             arma::uword sz = in.n_elem;
-            arma::Mat<T3> out(sz,1);
+            Eigen::MatrixXd<T3> out(sz,1);
             for( arma::uword n=0;n<sz;n++)
                 out[n] = this->operator()(in[n]);
             return out;
         }
-        arma::Col<T3> filter(const arma::Col<T1> & in)
+	Eigen::VectorXd<T3> filter(const Eigen::VectorXd<T1> & in)
         {
-           arma::Mat<T1> in_col = arma::conv_to<arma::Mat<T1> >::from(in);
-           return arma::conv_to<arma::Col<T3> >::from(filter(in_col));
+           Eigen::MatrixXd<T1> in_col = arma::conv_to<Eigen::MatrixXd<T1> >::from(in);
+           return arma::conv_to<Eigen::VectorXd<T3> >::from(filter(in_col));
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////
@@ -175,7 +175,7 @@ namespace sp
             if(do_adapt)
             {
                 // Reshape buf
-                arma::Mat<T1> buf_tmp(M,1);
+                Eigen::MatrixXd<T1> buf_tmp(M,1);
                 for(arma::uword m=0; m<M; m++)
                 {
                     buf_tmp(m) = buf((cur_p+m+1)%M);
@@ -227,7 +227,7 @@ namespace sp
             if(do_adapt)
             {
                 // Reshape buf
-                arma::Mat<T1> buf_tmp(M,1);
+                Eigen::MatrixXd<T1> buf_tmp(M,1);
                 for(arma::uword m=0; m<M; m++)
                 {
                     buf_tmp(m) = buf((cur_p+m+1)%M);
@@ -282,7 +282,7 @@ namespace sp
             if(do_adapt)
             {
                 // Reshape buf
-                arma::Mat<T1> buf_tmp(M,1);
+                Eigen::MatrixXd<T1> buf_tmp(M,1);
                 for(arma::uword m=0; m<M; m++)
                 {
                     buf_tmp(m) = buf((cur_p+m+1)%M);
@@ -296,8 +296,8 @@ namespace sp
                 if(blk_ctr++%L==0)
                 {
                       // Correlation matrix estimate
-                      arma::Mat<T1> Rxx = X_tpz*X_tpz.t()/L;
-                      arma::Mat<T1> I; I.eye(M,M);
+                      Eigen::MatrixXd<T1> Rxx = X_tpz*X_tpz.t()/L;
+                      Eigen::MatrixXd<T1> I; I.eye(M,M);
                       b+=mu*pinv(Rxx+c*I)*K/L;
                       K.zeros();
                 }
@@ -338,7 +338,7 @@ namespace sp
             if(do_adapt)
             {
                 // Reshape buf
-                arma::Mat<T1> buf_tmp(M,1);
+                Eigen::MatrixXd<T1> buf_tmp(M,1);
                 for(arma::uword m=0; m<M; m++)
                 {
                     buf_tmp(m) = buf((cur_p+m+1)%M);
@@ -392,7 +392,7 @@ namespace sp
             if(do_adapt)
             {
                 // Reshape buf
-                arma::Mat<T1> buf_tmp(M,1);
+                Eigen::MatrixXd<T1> buf_tmp(M,1);
                 for(arma::uword m=0; m<M; m++)
                 {
                     buf_tmp(m) = buf((cur_p+m+1)%M);
@@ -426,7 +426,7 @@ namespace sp
         /// \brief Get P
         /// @return P
         ////////////////////////////////////////////////////////////////////////////////////////////
-        arma::Mat<T1> get_P(void)
+        Eigen::MatrixXd<T1> get_P(void)
         {
             return P;
         }
@@ -435,7 +435,7 @@ namespace sp
         /// \brief Get K
         /// @return K
         ////////////////////////////////////////////////////////////////////////////////////////////
-        arma::Mat<T1> get_K(void)
+        Eigen::MatrixXd<T1> get_K(void)
         {
             return K;
         }
@@ -482,10 +482,10 @@ namespace sp
         arma::uword N;                ///< Nr of AR filter taps
         arma::uword b_cur_p;          ///< Pointer to current sample in MA buffer
         arma::uword a_cur_p;          ///< Pointer to current sample in AR buffer
-        arma::Col<T2> b;      ///< MA Filter coefficients
-        arma::Col<T2> a;      ///< AR Filter coefficients
-        arma::Col<T1> b_buf;  ///< MA Signal buffer
-        arma::Col<T1> a_buf;  ///< AR Signal buffer
+	Eigen::VectorXd<T2> b;      ///< MA Filter coefficients
+        Eigen::VectorXd<T2> a;      ///< AR Filter coefficients
+        Eigen::VectorXd<T1> b_buf;  ///< MA Signal buffer
+        Eigen::VectorXd<T1> a_buf;  ///< AR Signal buffer
     public:
         ////////////////////////////////////////////////////////////////////////////////////////////
         /// \brief Constructor.
@@ -514,7 +514,7 @@ namespace sp
         /// @param _b Filter coefficients \f$ [b_0 ..b_M] \f$
         /// @param _a Filter coefficients \f$ [a_0 ..a_N] \f$
         ////////////////////////////////////////////////////////////////////////////////////////////
-        void set_coeffs(const arma::Col<T2> &_b,const arma::Col<T2> &_a)
+        void set_coeffs(const Eigen::VectorXd<T2> &_b,const Eigen::VectorXd<T2> &_a)
         {
             M = _b.size();
             N = _a.size();
@@ -530,7 +530,7 @@ namespace sp
         /// @param _b Filter coefficients \f$ [b_0 ..b_M] \f$
         /// @param _a Filter coefficients \f$ [a_0 ..a_N] \f$
         ////////////////////////////////////////////////////////////////////////////////////////////
-        void update_coeffs(const arma::Col<T2> &_b,const arma::Col<T2> &_a)
+        void update_coeffs(const Eigen::VectorXd<T2> &_b,const Eigen::VectorXd<T2> &_a)
         {
             b = _b/_a[0];
             a = _a/_a[0];
@@ -582,10 +582,10 @@ namespace sp
         /// @return Filtered output
         /// @param in Input vector
         ////////////////////////////////////////////////////////////////////////////////////////////
-        arma::Col<T3> filter(const arma::Col<T1> & in)
+        Eigen::VectorXd<T3> filter(const Eigen::VectorXd<T1> & in)
         {
             arma::uword sz = in.size();
-            arma::Col<T3> out(sz);
+            Eigen::VectorXd<T3> out(sz);
             for( arma::uword n=0;n<sz;n++)
                 out[n] = this->operator()(in[n]);
             return out;
@@ -605,9 +605,9 @@ namespace sp
     /// @param M Filter order
     /// @param f0 Filter cutoff frequency in interval [0..1]
     ////////////////////////////////////////////////////////////////////////////////////////////
-    arma_inline arma::vec fir1(const arma::uword M, const double f0)
+    EIGEN_STRONG_INLINE Eigen::VectorXd fir1(const arma::uword M, const double f0)
     {
-        arma::vec b(M+1), h(M+1);
+        Eigen::VectorXd b(M+1), h(M+1);
         h = hamming(M+1);
         for (arma::uword m=0;m<M+1;m++)
         {
@@ -624,11 +624,11 @@ namespace sp
     /// @param M Filter order (must be even)
     /// @param f0 Filter cutoff frequency in interval [0..1]
     ////////////////////////////////////////////////////////////////////////////////////////////
-    arma_inline arma::vec fir1_hp(const arma::uword M, const double f0)
+    EIGEN_STRONG_INLINE Eigen::VectorXd fir1_hp(const arma::uword M, const double f0)
     {
         if(M%2 != 0)
             err_handler("Filter order must be even");
-        arma::vec b(M+1), h(M+1);
+        Eigen::VectorXd b(M+1), h(M+1);
         h = hamming(M+1);
         for (arma::uword m=0;m<M+1;m++)
         {
@@ -638,7 +638,7 @@ namespace sp
         // Scale
         std::complex<double> i(0,1);
         double nrm;
-        arma::vec fv=arma::regspace(0,double(M));
+        Eigen::VectorXd fv=arma::regspace(0,double(M));
         nrm = abs(arma::sum(exp(-i*fv*PI)%b));
 
         return b/nrm;
@@ -653,12 +653,12 @@ namespace sp
     /// @param f0 Filter low cutoff frequency in interval [0..1]
     /// @param f1 Filter high cutoff frequency in interval [0..1]
     ////////////////////////////////////////////////////////////////////////////////////////////
-    arma_inline arma::vec fir1_bp(const arma::uword M, const double f0, const double f1)
+    EIGEN_STRONG_INLINE Eigen::VectorXd fir1_bp(const arma::uword M, const double f0, const double f1)
     {
         if(f1<=f0)
             err_handler("Frequencies must be [0 < f0 < f1 < 1]");
 
-        arma::vec b(M+1), h(M+1);
+        Eigen::VectorXd b(M+1), h(M+1);
         h = hamming(M+1);
         for (arma::uword m=0;m<M+1;m++)
         {
@@ -669,7 +669,7 @@ namespace sp
         double fc = (f0+f1)/2;
         std::complex<double> i(0,1);
         double nrm;
-        arma::vec fv=arma::regspace(0,double(M));
+        Eigen::VectorXd fv=arma::regspace(0,double(M));
         nrm = abs(arma::sum(exp(-i*fv*PI*fc)%b));
 
         return b/nrm;
@@ -684,14 +684,14 @@ namespace sp
     /// @param f0 Filter low cutoff frequency in interval [0..1]
     /// @param f1 Filter high cutoff frequency in interval [0..1]
     ////////////////////////////////////////////////////////////////////////////////////////////
-    arma_inline arma::vec fir1_bs(const arma::uword M, const double f0, const double f1)
+    EIGEN_STRONG_INLINE Eigen::VectorXd fir1_bs(const arma::uword M, const double f0, const double f1)
     {
         if(M%2 != 0)
             err_handler("Filter order must be even");
         if(f1<=f0)
             err_handler("Frequencies must be [0 < f0 < f1 < 1]");
 
-        arma::vec b(M+1), h(M+1);
+        Eigen::VectorXd b(M+1), h(M+1);
         h = hamming(M+1);
         for (arma::uword m=0;m<M+1;m++)
         {
@@ -710,10 +710,10 @@ namespace sp
     /// @param M Filter length
     /// @param fd Fractional delay
     ////////////////////////////////////////////////////////////////////////////////////////////
-    arma_inline arma::vec fd_filter( const arma::uword M, double fd )
+    EIGEN_STRONG_INLINE Eigen::VectorXd fd_filter( const arma::uword M, double fd )
     {
-        arma::vec h(M);
-        arma::vec w = blackmanharris(M);
+        Eigen::VectorXd h(M);
+        Eigen::VectorXd w = blackmanharris(M);
         if( M % 2 == 1 ) fd = fd-0.5; // Offset for odd nr of taps
         for(arma::uword m=0;m<M;m++)
         {
@@ -731,9 +731,9 @@ namespace sp
     /// @param a IIR/AR filter coefficients
     /// @param K Number of evaluation points, Default 512
     ////////////////////////////////////////////////////////////////////////////////////////////
-    arma_inline arma::cx_vec freq( const arma::vec b, const arma::vec a, const arma::uword K=512)
+    EIGEN_STRONG_INLINE VectorXcd freq( const Eigen::VectorXd b, const Eigen::VectorXd a, const arma::uword K=512)
     {
-        arma::cx_vec h(K);
+        VectorXcd h(K);
         arma::uword M = b.size();
         arma::uword N = a.size();
         std::complex<double> b_tmp,a_tmp,i(0,1);
@@ -757,9 +757,9 @@ namespace sp
     /// @param a IIR/AR filter coefficients
     /// @param K Number of evaluation points, Default 512
     ////////////////////////////////////////////////////////////////////////////////////////////
-    arma_inline arma::vec freqz( const arma::vec b, const arma::vec a, const arma::uword K=512)
+    EIGEN_STRONG_INLINE Eigen::VectorXd freqz( const Eigen::VectorXd b, const Eigen::VectorXd a, const arma::uword K=512)
     {
-        arma::cx_vec f = freq(b,a,K);
+        VectorXcd f = freq(b,a,K);
         return abs(f);
     }
 
@@ -770,9 +770,9 @@ namespace sp
     /// @param a IIR/AR filter coefficients
     /// @param K Number of evaluation points, Default 512
     ////////////////////////////////////////////////////////////////////////////////////////////
-    arma_inline arma::vec phasez( const arma::vec b, const arma::vec a, const arma::uword K=512)
+    EIGEN_STRONG_INLINE Eigen::VectorXd phasez( const Eigen::VectorXd b, const Eigen::VectorXd a, const arma::uword K=512)
     {
-        arma::cx_vec f = freq(b,a,K);
+        VectorXcd f = freq(b,a,K);
         return angle(f);
     }
     /// @}

@@ -1,0 +1,13 @@
+||Armadillo||Eigen||
+|.t()|.transpose()|
+|arma_inline|EIGEN_STRONG_INLINE|
+|vec|VectorXd|
+|arma::vec|VectorXd|
+|arma::cx_vec|VectorXcd|
+|arma::Col<T>|Eigen::Vector<T, Eigen::Dynamic>|
+|arma::Mat<T>|Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>|
+|arma::mat|Eigen::MatrixXd|
+|arma::cx_mat|Eigen::MatrixXcd|
+|.n_rows|rows()|
+|.n_cols|cols()|
+|.copy_size(x)|.resize(x.rows(), x.cols())|

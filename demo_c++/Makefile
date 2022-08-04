@@ -1,5 +1,5 @@
 CXX = g++
-CXX_FLAGS = -Wall -std=c++11 -DHAVE_FFTW -I../sigpack -larmadillo -lfftw3
+CXX_FLAGS = -Wall -std=c++11 -DHAVE_FFTW -I../sigpack -I/usr/include/eigen3 -lfftw3
 
 %: %.cpp
 	@echo '+++++++++++++++++++++++++++++++++++++++++++++'

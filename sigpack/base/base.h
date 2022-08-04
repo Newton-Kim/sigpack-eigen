@@ -18,7 +18,7 @@ namespace sp
     /// \brief A sinc, sin(x)/x, function.
     /// @param x The angle in radians
     ////////////////////////////////////////////////////////////////////////////////////////////
-    arma_inline double sinc( double x )
+    EIGEN_STRONG_INLINE double sinc( double x )
     {
         if(x==0.0)
             return 1.0;
@@ -30,10 +30,10 @@ namespace sp
     /// \brief A sinc, sin(x)/x, function.
     /// @param x The angle in radians
     ////////////////////////////////////////////////////////////////////////////////////////////
-    arma_inline arma::vec sinc(const arma::vec& x)
+    EIGEN_STRONG_INLINE Eigen::VectorXd sinc(const Eigen::VectorXd& x)
     {
-        arma::vec out;
-        out.copy_size(x);
+        Eigen::VectorXd out;
+        out.resize(x.size());
         for (unsigned int n = 0; n < out.size(); n++)
         {
             out(n) = sinc(x(n));
@@ -47,7 +47,7 @@ namespace sp
     /// See bessel functions on [Wikipedia](https://en.wikipedia.org/wiki/Bessel_function)
     /// @param x
     ////////////////////////////////////////////////////////////////////////////////////////////
-    arma_inline double besseli0( double x )
+    EIGEN_STRONG_INLINE double besseli0( double x )
     {
         double y=1.0,s=1.0,x2=x*x,n=1.0;
         while (s > y*1.0e-9)
@@ -73,11 +73,11 @@ namespace sp
     /// \brief Calculates angle in radians for complex input.
     /// @param x Complex input vector
     ////////////////////////////////////////////////////////////////////////////////////////////
-    arma_inline arma::vec angle( const arma::cx_vec& x )
+    EIGEN_STRONG_INLINE Eigen::VectorXd angle( const Eigen::VectorXcd& x )
     {
-        arma::vec P;
-        P.copy_size(x);
-        for(unsigned int r=0; r<x.n_rows; r++)
+        Eigen::VectorXd P;
+        P.resize(x.size());
+        for(unsigned int r=0; r<x.rows(); r++)
             P(r) = std::arg(x(r));
         return P;
     }
@@ -86,12 +86,12 @@ namespace sp
     /// \brief Calculates angle in radians for complex input.
     /// @param x Complex input matrix
     ////////////////////////////////////////////////////////////////////////////////////////////
-    arma_inline arma::mat angle( const arma::cx_mat& x )
+    EIGEN_STRONG_INLINE Eigen::MatrixXd angle( const Eigen::MatrixXcd& x )
     {
-        arma::mat P;
-        P.copy_size(x);
-        for(unsigned int r=0; r<x.n_rows; r++)
-            for(unsigned int c=0; c<x.n_cols; c++)
+        Eigen::MatrixXd P;
+        P.resize(x.rows(), x.cols());
+        for(unsigned int r=0; r<x.rows(); r++)
+            for(unsigned int c=0; c<x.cols(); c++)
                 P(r,c) = std::arg(x(r,c));
         return P;
     }
@@ -100,14 +100,14 @@ namespace sp
     /// \brief Unwraps the angle vector x, accumulates phase.
     /// @param x Complex input vector
     ////////////////////////////////////////////////////////////////////////////////////////////
-    arma_inline arma::vec unwrap( const arma::vec& x )
+    EIGEN_STRONG_INLINE Eigen::VectorXd unwrap( const Eigen::VectorXd& x )
     {
-        arma::vec P;
+        Eigen::VectorXd P;
         double pacc = 0, pdiff = 0;
         const double thr=PI*170/180;
-        P.copy_size(x);
+        P.resize(x.size());
         P(0)=x(0);
-        for(unsigned int r=1; r<x.n_rows; r++)
+        for(unsigned int r=1; r<x.rows(); r++)
         {
             pdiff = x(r)-x(r-1);
             if( pdiff >= thr ) pacc += -PI_2;
@@ -128,9 +128,9 @@ namespace sp
     /// @param N  Number of data points
     /// @param Fs Sample rate
     ////////////////////////////////////////////////////////////////////////////////////////////
-    arma_inline arma::vec timevec( const int N, const double Fs )
+    EIGEN_STRONG_INLINE Eigen::VectorXd timevec( const int N, const double Fs )
     {
-        return arma::regspace(0,N-1.0)/Fs;
+        return Eigen::VectorXd::LinSpaced(1,0,N-1.0)/Fs;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////
@@ -139,9 +139,9 @@ namespace sp
     /// @param Pxx Complex FFT
     ////////////////////////////////////////////////////////////////////////////////////////////
     template <typename T>
-    arma::Col<T> fftshift(const arma::Col<T>& Pxx)
+    Eigen::Vector<T, Eigen::Dynamic> fftshift(const Eigen::Vector<T, Eigen::Dynamic>& Pxx)
     {
-        arma::Col<T> x(Pxx.n_elem);
+        Eigen::Vector<T, Pxx.n_elem> x;
         x = shift(Pxx, floor(Pxx.n_elem / 2));
         return x;
     }
@@ -152,9 +152,9 @@ namespace sp
     /// @param Pxx Complex FFT
     ////////////////////////////////////////////////////////////////////////////////////////////
     template <typename T>
-    arma::Col<T> ifftshift(const arma::Col<T>& Pxx)
+    Eigen::Vector<T, Eigen::Dynamic> ifftshift(const Eigen::Vector<T, Eigen::Dynamic>& Pxx)
     {
-        arma::Col<T> x(Pxx.n_elem);
+        Eigen::Vector<T, Pxx.n_elem> x;
         x = shift(Pxx, -ceil(Pxx.n_elem / 2));
         return x;
     }
@@ -165,11 +165,11 @@ namespace sp
     /// @param Pxx FFT
     ////////////////////////////////////////////////////////////////////////////////////////////
     template <typename T>
-    arma::Mat<T> fftshift(const arma::Mat<T>& Pxx)
+    Matrix<T, Eigen::Dynamic, Eigen::Dynamic> fftshift(const Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& Pxx)
     {
-        arma::uword R = Pxx.n_rows;
-        arma::uword C = Pxx.n_cols;
-        arma::Mat<T> x(R, C);
+        arma::uword R = Pxx.rows();
+        arma::uword C = Pxx.cols();
+        Matrix<T, R, C> x;
         x = arma::shift(Pxx, static_cast<arma::sword>(floor(R / 2)), 0);
         x = arma::shift(x, static_cast<arma::sword>(floor(C / 2)), 1);
         return x;
@@ -181,11 +181,11 @@ namespace sp
     /// @param Pxx FFT
     ////////////////////////////////////////////////////////////////////////////////////////////
     template <typename T>
-    arma::Mat<T> ifftshift(const arma::Mat<T>& Pxx)
+    MatrixXd<T> ifftshift(const MatrixXd<T>& Pxx)
     {
-        arma::uword R = Pxx.n_rows;
-        arma::uword C = Pxx.n_cols;
-        arma::Mat<T> x(R, C);
+        arma::uword R = Pxx.rows();
+        arma::uword C = Pxx.cols();
+        MatrixXd<T> x(R, C);
         x = shift(Pxx, -ceil(R / 2), 0);
         x = shift(x, -ceil(C / 2), 1);
         return x;
@@ -201,7 +201,7 @@ namespace sp
     ////////////////////////////////////////////////////////////////////////////////////////////
     /// \brief SigPack version string
     ////////////////////////////////////////////////////////////////////////////////////////////
-    arma_inline std::string sp_version(void)
+    EIGEN_STRONG_INLINE std::string sp_version(void)
     {
         return std::to_string(SP_VERSION_MAJOR)+"."+std::to_string(SP_VERSION_MINOR)+"."+std::to_string(SP_VERSION_PATCH);
     }

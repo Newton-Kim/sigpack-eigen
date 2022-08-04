@@ -16,7 +16,7 @@
 //  1.1.1   Claes Rolén     2017-01-20  Cleanup, added Kalman and Newton adaptive filters
 //  1.1.2   Claes Rolén     2017-03-07  Added Kalman tracking and control
 //  1.2.1   Claes Rolén     2017-03-13  Updated for Gnuplot 5.0, plot(..) changes to plot_add(..) plus plot_show()
-//  1.2.2   Claes Rolén     2017-07-13  Added EKF and UKF classes, Non class functions set to arma_inline.
+//  1.2.2   Claes Rolén     2017-07-13  Added EKF and UKF classes, Non class functions set to EIGEN_STRONG_INLINE.
 //  1.2.3   Claes Rolén     2017-08-08  Updated FIR design functions, support for highpass, bandpass and bandstop.
 //  1.2.4   Claes Rolén     2018-03-17  Updated resampling class, added goertzel and timevec functions.
 //  1.2.5   Claes Rolén     2019-01-04  Removed warnings in Visual Studio. Bug fix in PNM class write_header().
@@ -27,9 +27,7 @@
 
 
 
-#ifndef ARMA_INCLUDES
-#include <armadillo>
-#endif
+#include <Eigen/Eigen>
 
 #ifndef SIGPACK_H
 #define SIGPACK_H

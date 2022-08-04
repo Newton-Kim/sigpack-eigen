@@ -21,7 +21,7 @@ namespace sp
         private:
             arma::uword D;        ///< The delay value
             arma::uword cur_p;    ///< Pointer to current sample in buffer
-            arma::Col<T1> buf;    ///< Signal buffer
+            Eigen::VectorXd<T1> buf;    ///< Signal buffer
         public:
             ////////////////////////////////////////////////////////////////////////////////////////////
             /// \brief Constructor.
@@ -86,10 +86,10 @@ namespace sp
             /// \brief A delay operator (vector version).
             /// @param in vector input
             ////////////////////////////////////////////////////////////////////////////////////////////
-            arma::Col<T1> delay(const arma::Col<T1>& in)
+            Eigen::VectorXd<T1> delay(const Eigen::VectorXd<T1>& in)
             {
                 arma::uword sz = in.size();
-                arma::Col<T1> out(sz);
+                Eigen::VectorXd<T1> out(sz);
                 for(arma::uword n=0; n<sz; n++)
                     out[n] = this->operator()(in[n]);
                 return out;
