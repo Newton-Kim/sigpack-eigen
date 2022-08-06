@@ -16,12 +16,10 @@ int main()
 	b = fir1(7,0.35);
 	fir_filt.set_coeffs(b);
 
-	VectorXd X(N);  // Input sig
-	X.zeros();
+	VectorXd X = VectorXd::Zero(N);  // Input sig
 	X[0] = 1;  // Impulse 
 
-	VectorXd Y(N);  // Output sig
-	Y.zeros();
+	VectorXd Y = VectorXd::Zero(N);  // Output sig
 	
 	// Filter - sample loop
 	for(int n=0;n<N;n++)

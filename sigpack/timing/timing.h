@@ -19,9 +19,9 @@ namespace sp
     class Delay
     {
         private:
-            arma::uword D;        ///< The delay value
-            arma::uword cur_p;    ///< Pointer to current sample in buffer
-            Eigen::VectorXd<T1> buf;    ///< Signal buffer
+            uword D;        ///< The delay value
+            uword cur_p;    ///< Pointer to current sample in buffer
+            Eigen::Vector<T1, Eigen::Dynamic> buf;    ///< Signal buffer
         public:
             ////////////////////////////////////////////////////////////////////////////////////////////
             /// \brief Constructor.
@@ -36,7 +36,7 @@ namespace sp
             /// \brief Constructor with delay input.
             /// @param _D delay
             ////////////////////////////////////////////////////////////////////////////////////////////
-            Delay(const arma::uword _D)
+            Delay(const uword _D)
             {
                 set_delay(_D);
                 clear();
@@ -52,7 +52,7 @@ namespace sp
             ////////////////////////////////////////////////////////////////////////////////////////////
             void clear(void)
             {
-                buf.zeros();
+                buf = Eigen::Vector<T1, Eigen::Dynamic>::Zero(buf.size());
                 cur_p = 0;
             }
 
@@ -60,10 +60,10 @@ namespace sp
             /// \brief Sets delay.
             /// @param _D delay
             ////////////////////////////////////////////////////////////////////////////////////////////
-            void set_delay(const arma::uword _D)
+            void set_delay(const uword _D)
             {
                 D = _D+1;
-                buf.set_size(D);
+                buf.resize(D);
             }
 
             ////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,11 +86,11 @@ namespace sp
             /// \brief A delay operator (vector version).
             /// @param in vector input
             ////////////////////////////////////////////////////////////////////////////////////////////
-            Eigen::VectorXd<T1> delay(const Eigen::VectorXd<T1>& in)
+            Eigen::Vector<T1, Eigen::Dynamic> delay(const Eigen::Vector<T1, Eigen::Dynamic>& in)
             {
-                arma::uword sz = in.size();
-                Eigen::VectorXd<T1> out(sz);
-                for(arma::uword n=0; n<sz; n++)
+                uword sz = in.size();
+                Eigen::Vector<T1, Eigen::Dynamic> out(sz);
+                for(uword n=0; n<sz; n++)
                     out[n] = this->operator()(in[n]);
                 return out;
             }

@@ -165,13 +165,14 @@ namespace sp
     /// @param Pxx FFT
     ////////////////////////////////////////////////////////////////////////////////////////////
     template <typename T>
-    Matrix<T, Eigen::Dynamic, Eigen::Dynamic> fftshift(const Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& Pxx)
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> fftshift(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& Pxx)
     {
-        arma::uword R = Pxx.rows();
-        arma::uword C = Pxx.cols();
-        Matrix<T, R, C> x;
-        x = arma::shift(Pxx, static_cast<arma::sword>(floor(R / 2)), 0);
-        x = arma::shift(x, static_cast<arma::sword>(floor(C / 2)), 1);
+        uword R = Pxx.rows();
+        uword C = Pxx.cols();
+	Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> x;
+	x.resize(R, C);
+        x = arma::shift(Pxx, static_cast<sword>(floor(R / 2)), 0);
+        x = arma::shift(x, static_cast<sword>(floor(C / 2)), 1);
         return x;
     }
 
@@ -181,11 +182,12 @@ namespace sp
     /// @param Pxx FFT
     ////////////////////////////////////////////////////////////////////////////////////////////
     template <typename T>
-    MatrixXd<T> ifftshift(const MatrixXd<T>& Pxx)
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> ifftshift(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& Pxx)
     {
-        arma::uword R = Pxx.rows();
-        arma::uword C = Pxx.cols();
-        MatrixXd<T> x(R, C);
+        uword R = Pxx.rows();
+        uword C = Pxx.cols();
+	Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> x;
+	x.resize(R, C);
         x = shift(Pxx, -ceil(R / 2), 0);
         x = shift(x, -ceil(C / 2), 1);
         return x;

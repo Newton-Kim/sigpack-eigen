@@ -11,3 +11,7 @@
 |.n_rows|rows()|
 |.n_cols|cols()|
 |.copy_size(x)|.resize(x.rows(), x.cols())|
+|arma::uword|uword|
+|arma::sword|sword|
+|zeros<x>(n)|x::Zero(n)|
+|.set_size|.resize|

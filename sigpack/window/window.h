@@ -20,10 +20,10 @@ namespace sp
     /// @param N Number of window taps
     /// @param a A vector of cosinus coefficients
     ////////////////////////////////////////////////////////////////////////////////////////////
-    EIGEN_STRONG_INLINE Eigen::VectorXd cos_win( const arma::uword N, const Eigen::VectorXd& a )
+    EIGEN_STRONG_INLINE Eigen::VectorXd cos_win( const uword N, const Eigen::VectorXd& a )
     {
         Eigen::VectorXd h(N);
-        for(arma::uword i=0; i<N; i++)
+        for(uword i=0; i<N; i++)
         {
             h[i] = a[0] - a[1]*std::cos(1.0*PI_2*i/(N-1)) + a[2]*std::cos(2.0*PI_2*i/(N-1)) \
                    - a[3]*std::cos(3.0*PI_2*i/(N-1)) + a[4]*std::cos(4.0*PI_2*i/(N-1));
@@ -37,9 +37,9 @@ namespace sp
     /// \f$ w_i = 0.54-0.46\ cos(2\pi i /(N-1))\f$
     /// @param N Nr of taps
     ////////////////////////////////////////////////////////////////////////////////////////////
-    EIGEN_STRONG_INLINE Eigen::VectorXd hamming( const arma::uword N )
+    EIGEN_STRONG_INLINE Eigen::VectorXd hamming( const uword N )
     {
-        Eigen::VectorXd a=arma::zeros<Eigen::VectorXd>(5);
+        Eigen::VectorXd a=Eigen::VectorXd::Zero(5);
         a[0] = 0.54;
         a[1] = 0.46;
         return cos_win(N,a);
@@ -51,9 +51,9 @@ namespace sp
     /// \f$ w_i = 0.5-0.5\ cos(2\pi i /(N-1))\f$
     /// @param N Nr of taps
     ////////////////////////////////////////////////////////////////////////////////////////////
-    EIGEN_STRONG_INLINE Eigen::VectorXd hann( const arma::uword N )
+    EIGEN_STRONG_INLINE Eigen::VectorXd hann( const uword N )
     {
-        Eigen::VectorXd a=arma::zeros<Eigen::VectorXd>(5);
+        Eigen::VectorXd a=Eigen::VectorXd::Zero(5);
         a[0] = 0.5;
         a[1] = 0.5;
         return cos_win(N,a);
@@ -65,9 +65,9 @@ namespace sp
     /// \f$ w_i = 0.42-0.5\ cos(2\pi i /(N-1))+0.08\ cos(4\pi i /(N-1))\f$
     /// @param N Nr of taps
     ////////////////////////////////////////////////////////////////////////////////////////////
-    EIGEN_STRONG_INLINE Eigen::VectorXd blackman( const arma::uword N )
+    EIGEN_STRONG_INLINE Eigen::VectorXd blackman( const uword N )
     {
-        Eigen::VectorXd a=arma::zeros<Eigen::VectorXd>(5);
+        Eigen::VectorXd a=Eigen::VectorXd::Zero(5);
         a[0] = 0.42; // 7938/18608.0
         a[1] = 0.5;  // 9240/18608.0
         a[2] = 0.08; // 1430/18608.0
@@ -81,9 +81,9 @@ namespace sp
     /// \f$ w_i = 0.359-0.488\ cos(2\pi i /(N-1))+0.141\ cos(4\pi i /(N-1))-0.011\ cos(6\pi i /(N-1))\f$
     /// @param N Nr of taps
     ////////////////////////////////////////////////////////////////////////////////////////////
-    EIGEN_STRONG_INLINE Eigen::VectorXd blackmanharris( const arma::uword N )
+    EIGEN_STRONG_INLINE Eigen::VectorXd blackmanharris( const uword N )
     {
-        Eigen::VectorXd a=arma::zeros<Eigen::VectorXd>(5);
+        Eigen::VectorXd a=Eigen::VectorXd::Zero(5);
         a[0] = 0.35875;
         a[1] = 0.48829;
         a[2] = 0.14128;
@@ -97,9 +97,9 @@ namespace sp
     /// \f$ w_i = 0.216-0.417\ cos(2\pi i /(N-1))+0.277\ cos(4\pi i /(N-1))-0.084\ cos(6\pi i /(N-1))+0.007\ cos(8\pi i /(N-1))\f$
     /// @param N Nr of taps
     ////////////////////////////////////////////////////////////////////////////////////////////
-    EIGEN_STRONG_INLINE Eigen::VectorXd flattopwin( const arma::uword N )
+    EIGEN_STRONG_INLINE Eigen::VectorXd flattopwin( const uword N )
     {
-        Eigen::VectorXd a=arma::zeros<Eigen::VectorXd>(5);
+        Eigen::VectorXd a=Eigen::VectorXd::Zero(5);
         a[0] = 0.21557895;
         a[1] = 0.41663158;
         a[2] = 0.277263158;
@@ -114,10 +114,10 @@ namespace sp
     /// \f$ w_i = 0.5-0.5\ cos(2\pi (i+1) /(N+1))\f$
     /// @param N Nr of taps
     ////////////////////////////////////////////////////////////////////////////////////////////
-    EIGEN_STRONG_INLINE Eigen::VectorXd hanning( const arma::uword N )
+    EIGEN_STRONG_INLINE Eigen::VectorXd hanning( const uword N )
     {
         Eigen::VectorXd h(N);
-        for(arma::uword i=0; i<N; i++)
+        for(uword i=0; i<N; i++)
         {
             h[i] = 0.5-0.5*std::cos(PI_2*(i+1)/(N+1));
         }
@@ -131,11 +131,11 @@ namespace sp
     /// @param N Nr of taps
     /// @param beta Beta factor
     ////////////////////////////////////////////////////////////////////////////////////////////
-    EIGEN_STRONG_INLINE Eigen::VectorXd kaiser( const arma::uword N, double beta )
+    EIGEN_STRONG_INLINE Eigen::VectorXd kaiser( const uword N, double beta )
     {
         Eigen::VectorXd h(N);
         double bb = besseli0(beta);
-        for( arma::uword i=0; i<N; i++)
+        for( uword i=0; i<N; i++)
         {
             h[i] = besseli0(beta*sqrt(4.0*i*(N-1-i))/(N-1))/bb;
         }
@@ -148,12 +148,12 @@ namespace sp
     /// See Triangle window at [Wikipedia](https://en.wikipedia.org/wiki/Window_function#Triangular_window)
     /// @param N Nr of taps
     ////////////////////////////////////////////////////////////////////////////////////////////
-    EIGEN_STRONG_INLINE Eigen::VectorXd triang( const arma::uword N )
+    EIGEN_STRONG_INLINE Eigen::VectorXd triang( const uword N )
     {
         Eigen::VectorXd h(N);
         if(N%2)    // Odd
         {
-            for(arma::uword i=0; i<(N-1)/2; i++)
+            for(uword i=0; i<(N-1)/2; i++)
             {
                 h[i]     = 2.0*(i+1)/(N+1);
                 h[N-i-1] = h[i];
@@ -162,7 +162,7 @@ namespace sp
         }
         else      // Even
         {
-            for(arma::uword i=0; i<N/2; i++)
+            for(uword i=0; i<N/2; i++)
             {
                 h[i]     = (2.0*i+1)/N;
                 h[N-i-1] = h[i];

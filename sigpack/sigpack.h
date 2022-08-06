@@ -25,8 +25,6 @@
 //                                      Removed need of -Dunix flag.
 //  1.2.7   Claes Rolén     2019-09-24  Bug fix in sp_version(), made it inline. 
 
-
-
 #include <Eigen/Eigen>
 
 #ifndef SIGPACK_H
@@ -36,6 +34,7 @@
 #define SP_VERSION_MINOR 2
 #define SP_VERSION_PATCH 7
 
+#include "base/types.h"
 #include "base/base.h"
 #include "window/window.h"
 #include "filter/filter.h"
