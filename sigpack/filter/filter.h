@@ -64,7 +64,7 @@ namespace sp
         ////////////////////////////////////////////////////////////////////////////////////////////
         void set_coeffs(const Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic> &_b)
         {
-            M = _b.n_elem;
+            M = _b.innerSize();
             buf.resize(M,1);
             this->clear();
             b.resize(M,1);
@@ -613,7 +613,7 @@ namespace sp
         {
             b[m] = f0*h[m]*sinc(f0*(m-M/2.0));
         }
-        return b/arma::sum(b);
+        return b/b.sum();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////
@@ -639,7 +639,7 @@ namespace sp
         std::complex<double> i(0,1);
         double nrm;
         Eigen::VectorXd fv=arma::regspace(0,double(M));
-        nrm = abs(arma::sum(exp(-i*fv*PI)%b));
+        nrm = abs(((-i*fv*PI).exp()%b).sum());
 
         return b/nrm;
     }
@@ -670,7 +670,7 @@ namespace sp
         std::complex<double> i(0,1);
         double nrm;
         Eigen::VectorXd fv=arma::regspace(0,double(M));
-        nrm = abs(arma::sum(exp(-i*fv*PI*fc)%b));
+        nrm = abs(((-i*fv*PI*fc).exp()%b).sum());
 
         return b/nrm;
     }
@@ -698,7 +698,7 @@ namespace sp
             b[m] = h[m]*(sinc(m-M/2.0)-f1*sinc(f1*(m-M/2.0))+f0*sinc(f0*(m-M/2.0)));
         }
 
-        return b/arma::sum(b);
+        return b/b.sum();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////
@@ -719,7 +719,7 @@ namespace sp
         {
             h(m) = w(m)*sinc(m-M/2.0-fd);
         }
-        h = h/arma::sum(h);  // Normalize gain
+        h = h/h.sum();  // Normalize gain
 
         return h;
     }
@@ -760,7 +760,7 @@ namespace sp
     EIGEN_STRONG_INLINE Eigen::VectorXd freqz( const Eigen::VectorXd b, const Eigen::VectorXd a, const uword K=512)
     {
         Eigen::VectorXcd f = freq(b,a,K);
-        return abs(f);
+        return f.abs();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////
