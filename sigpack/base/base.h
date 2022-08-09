@@ -171,8 +171,8 @@ namespace sp
         uword C = Pxx.cols();
 	Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> x;
 	x.resize(R, C);
-        x = arma::shift(Pxx, static_cast<sword>(floor(R / 2)), 0);
-        x = arma::shift(x, static_cast<sword>(floor(C / 2)), 1);
+        x = shift(Pxx, static_cast<sword>(floor(R / 2)), 0);
+        x = shift(x, static_cast<sword>(floor(C / 2)), 1);
         return x;
     }
 

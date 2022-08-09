@@ -17,5 +17,5 @@ namespace sp
     typedef int32_t sword;
 #endif //__x86_64__
 }
-#endif //SP_BASE_H
+#endif //SP_TYPES_H
 

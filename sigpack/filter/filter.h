@@ -5,6 +5,15 @@
 #define SP_FILTER_H
 namespace sp
 {
+    Eigen::VectorXd regspace (uword start, uword end) {
+      int step = (start > end) ? 1 : -1;
+      uword sz = (start > end) ? start - end + 1 : end - start + 1;
+      Eigen::VectorXd ret(sz);
+      for(uword v = start, idx = 0 ; v <= end ; v += step, idx++) {
+        ret[idx] = v;
+      }
+      return ret;
+    }
     ///
     /// @defgroup filter Filter
     /// \brief FIR/MA and IIR/ARMA filter functions.
@@ -78,8 +87,11 @@ namespace sp
         ////////////////////////////////////////////////////////////////////////////////////////////
         void set_coeffs(const Eigen::Vector<T2, Eigen::Dynamic> &_b_col)
         {
-          Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic> b_mat = arma::conv_to<Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic> >::from(_b_col);
+          /*
+	  Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic> b_mat = arma::conv_to<Eigen::Matrix<T2, Eigen::Dynamic, Eigen::Dynamic> >::from(_b_col);
           set_coeffs(b_mat);
+	  */
+          set_coeffs(_b_col);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,7 +100,8 @@ namespace sp
         ////////////////////////////////////////////////////////////////////////////////////////////
 	Eigen::Vector<T2, Eigen::Dynamic> get_coeffs()
         {
-           return arma::conv_to<Eigen::Vector<T2, Eigen::Dynamic> >::from(b);
+           //return arma::conv_to<Eigen::Vector<T2, Eigen::Dynamic> >::from(b);
+	   return b;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////
@@ -139,8 +152,11 @@ namespace sp
         }
 	Eigen::Vector<T3, Eigen::Dynamic> filter(const Eigen::Vector<T1, Eigen::Dynamic> & in)
         {
+           /*
            Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic> in_col = arma::conv_to<Eigen::Matrix<T1, Eigen::Dynamic, Eigen::Dynamic> >::from(in);
            return arma::conv_to<Eigen::Vector<T3, Eigen::Dynamic> >::from(filter(in_col));
+	   */
+           return filter(in);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////
@@ -234,7 +250,7 @@ namespace sp
                 }
 
                 // Accumulate
-                T1 S = c + arma::as_scalar(buf_tmp.t()*buf_tmp);
+                T1 S = c + (buf_tmp.transpose()*buf_tmp).value();
                 K += _err*buf_tmp/S;
 
                 // Block update
@@ -345,7 +361,7 @@ namespace sp
                 }
 
                 // Update P
-                T1 S = lmd + arma::as_scalar(buf_tmp.t()*P*buf_tmp);
+                T1 S = lmd + (buf_tmp.t()*P*buf_tmp).value();
                 K = P*buf_tmp/S;
                 P = (P-K*buf_tmp.t()*P)/lmd;
 
@@ -399,7 +415,7 @@ namespace sp
                 }
 
                 // Innovation/error covariance
-                T1 S = arma::as_scalar(R+buf_tmp.t()*P*buf_tmp);
+                T1 S = (R+buf_tmp.t()*P*buf_tmp).value();
 
                 // Kalman gain
                 K = P*buf_tmp/S;
@@ -638,7 +654,7 @@ namespace sp
         // Scale
         std::complex<double> i(0,1);
         double nrm;
-        Eigen::VectorXd fv=arma::regspace(0,double(M));
+        Eigen::VectorXd fv=regspace(0,double(M));
         nrm = abs(((-i*fv*PI).exp()%b).sum());
 
         return b/nrm;
@@ -669,7 +685,7 @@ namespace sp
         double fc = (f0+f1)/2;
         std::complex<double> i(0,1);
         double nrm;
-        Eigen::VectorXd fv=arma::regspace(0,double(M));
+        Eigen::VectorXd fv=regspace(0,double(M));
         nrm = abs(((-i*fv*PI*fc).exp()%b).sum());
 
         return b/nrm;

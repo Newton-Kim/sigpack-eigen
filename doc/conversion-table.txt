@@ -15,3 +15,6 @@
 |arma::sword|sword|
 |zeros<x>(n)|x::Zero(n)|
 |.set_size|.resize|
+|as_scalar|.value()|
+|convert_to| |
+|regspace| |
